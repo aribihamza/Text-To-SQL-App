@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Your Application</title>
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+  </head>
+  <body>
+    <!-- Place your scripts here -->
+    <script src="../static/jquery-3.5.1.js"></script>
+    <script src="../static/bootstrap.bundle.min.js"></script>
+    
+    <!-- Then place the body block -->
+    {% block body %}{% endblock %}
+    
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                {% for message in messages %}
+                  <p>{{ message }}</p>
+                {% endfor %}
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+          $(document).ready(function() {
+            $('#messageModal').modal('show');
+          });
+        </script>
+      {% endif %}
+    {% endwith %}
+  </body>
+</html>
