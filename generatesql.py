@@ -1,8 +1,8 @@
-from  flask import flash
+from flask import flash
 import openai
 import sqlparse
 
-openai.api_key = "Your_Openai_key_here"
+openai.api_key = "Your_api_key_here"
 
 class GenerateSQL:
     def generate_sql(self, question, structure):

@@ -1,0 +1,42 @@
+# Text-To-SQL APP
+
+This is a Flask-based application that allows you to generate SQL queries from text questions.
+
+## Installation
+
+1. Clone the repository to your local machine.
+2. Install the required dependencies by running `pip install -r requirements.txt`.
+
+## Configuration
+
+1. Open the `generatesql.py` file located in the project directory.
+2. Find the line that says `openai.api_key = "YOUR_API_KEY"`.
+3. Replace `"YOUR_API_KEY"` with your actual OpenAI API key.
+4. Save the changes to the `generatesql.py` file.
+
+## Usage
+
+1. Run the `app.py` file to start the Flask application.
+2. Open your web browser and navigate to `http://localhost:5000`.
+3. Enter the required database connection details in the login form.
+4. Once logged in, you can enter a SQL query directly in the query form or ask a question in the question form.
+5. The application will generate and execute the SQL query based on the provided question or manually entered query.
+6. The results will be displayed on the page.
+
+## Files
+
+- `app.py`: Contains the main Flask application logic.
+- `db_connector.py`: Provides a class for connecting to the database and retrieving the database structure.
+- `generatesql.py`: Implements the generation of SQL queries from text questions using OpenAI's GPT-3 model.
+- `forms.py`: Defines the Flask forms used in the application.
+
+## Contributing
+
+Contributions are welcome! If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request.
+
+
+## License
+
+HAMZA ARIBI
+
+hamzaaribi916@gmail.com

@@ -1,10 +1,11 @@
-from flask import Flask, flash, render_template, redirect, url_for, session , request, url_for
-from classes import QueryForm, LoginForm, QuestionForm
+from flask import Flask, flash, render_template, redirect, url_for, session, request, url_for
+from forms import QueryForm, LoginForm, QuestionForm
 from db_connector import DBConnector
 from generatesql import GenerateSQL
 from datetime import timedelta
 from functools import wraps
 import secrets
+
 sql_generator = GenerateSQL()
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
@@ -23,6 +24,7 @@ def login_required(f):
 def home():
     form = LoginForm()
     if form.validate_on_submit():
+        # Store form data in session
         session["server"] = form.server.data
         session["database"] = form.database.data
         session["username"] = form.username.data
@@ -37,7 +39,7 @@ def home():
             flash('You were successfully logged in')
             return redirect(url_for("query"))
         except Exception as e:
-            flash('Invalid credentials'+str(e))
+            flash('Invalid credentials')
     return render_template("connect.html", form=form)
 
 
@@ -49,16 +51,24 @@ def query():
     structure = None
     query_text = ""
     if form.validate_on_submit():
+        # Extract the query text from the form and sanitize it
         query_text = form.query.data.strip().upper()
+
+        # Check if the query starts with "SELECT"
         if not query_text.startswith("SELECT"):
             flash('Only SELECT queries are allowed')
             return render_template("query.html", form=form, previous_query=query_text, question=session.get("question", ""))
+
+        # Store the query in the session
         session["query"] = query_text
+
+        # Connect to the database and retrieve the database structure
         db = DBConnector(session["db_type"], session["server"], session["database"], session["username"], session["password"])
         connection = db.connect()
         structure = db.get_db_structure()
         print(structure)
 
+        # Execute the query and fetch the results
         cursor = connection.cursor()
         try:
             cursor.execute(query_text)
@@ -78,34 +88,42 @@ def question():
     form = QuestionForm()
     results = None
     structure = None
-    query_text = session.get("query", "")  
+    query_text = session.get("query", "")
     question_text = ""
     if form.validate_on_submit():
+        # Extract the question text and query text from the form
         question_text = form.question.data
-        session["question"] = question_text  
+        session["question"] = question_text
+        query_text = form.query.data
 
-        query_text = form.query.data 
-
+        # Connect to the database and retrieve the database structure
         db = DBConnector(session["db_type"], session["server"], session["database"], session["username"], session["password"])
         connection = db.connect()
         structure = db.get_db_structure()
         print(structure)
 
+        # Generate SQL query from the question and structure
         query = sql_generator.generate_sql(question_text, structure)
         if query is not None:
-            query = query.strip().upper()  
+            query = query.strip().upper()
+
+            # Check if the generated query starts with "SELECT"
             if not query.startswith("SELECT"):
                 flash('Only SELECT queries are allowed')
                 return render_template("query.html", form=form, previous_query=query_text, question=session.get("question", ""))
+
+            # Execute the generated query and fetch the results
             try:
                 cursor = connection.cursor()
                 cursor.execute(query)
                 results = cursor.fetchall()
                 cursor.close()
-                session["query"] = query  
-                query_text = query  
+
+                # Update the session query and query text
+                session["query"] = query
+                query_text = query
             except Exception as e:
-                flash('Failed to execute SQL query')
+                flash('Ask your question in a different way')
         else:
             flash('Failed to generate a valid SQL query from the given question')
 
@@ -114,10 +132,13 @@ def question():
     return render_template("query.html", form=form, results=results, previous_query=query_text,
                            question=session.get("question", ""))
 
+
 @app.route("/logout")
 def logout():
+    # Clear the session and redirect to the home page
     session.clear()
     return redirect(url_for('home'))
 
 if __name__ == "__main__":
+    # Run the Flask application in debug mode
     app.run(debug=True)

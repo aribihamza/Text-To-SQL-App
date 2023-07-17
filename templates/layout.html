@@ -1,8 +1,11 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <title>Your Application</title>
+    <title>Text-To-SQL</title>
     <link rel="stylesheet" href="../static/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/Styles.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
+  
   </head>
   <body>
     <!-- Place your scripts here -->
@@ -14,6 +17,7 @@
     
     {% with messages = get_flashed_messages() %}
       {% if messages %}
+        <!-- Modal for displaying flash messages -->
         <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -24,6 +28,7 @@
                 </button>
               </div>
               <div class="modal-body">
+                <!-- Loop over messages and display them in paragraphs -->
                 {% for message in messages %}
                   <p>{{ message }}</p>
                 {% endfor %}
@@ -35,6 +40,7 @@
           </div>
         </div>
         <script>
+          // Show the message modal when the document is ready
           $(document).ready(function() {
             $('#messageModal').modal('show');
           });

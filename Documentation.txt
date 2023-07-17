@@ -1,0 +1,50 @@
+Text-To-SQL App Documentation
+The Text-To-SQL App is a Flask-based web application that allows users to connect to a database, execute SQL queries, and generate SQL queries based on natural language questions.
+
+App.py
+This file contains the main application logic and routes.
+
+Routes:
+/ (Home): Renders the login form and handles the login functionality.
+/query: Renders the query form and handles the execution of SQL queries.
+/question: Renders the question form and handles the generation of SQL queries based on questions.
+/logout: Logs out the user and clears the session.
+Functions:
+login_required: Decorator function that checks if a user is logged in before accessing certain routes.
+db_connector.py
+This file defines the DBConnector class, responsible for connecting to the database and retrieving its structure.
+
+Class Methods:
+__init__(self, db_type, server, database, username, password): Initializes the DBConnector object with the provided database credentials.
+get_conn_str(self): Returns the connection string based on the selected database type.
+connect(self): Establishes a connection to the database using the provided credentials.
+get_db_structure(self): Retrieves the structure of the connected database.
+close(self): Closes the database connection.
+generatesql.py
+This file contains the GenerateSQL class, which utilizes OpenAI's API to generate SQL queries based on natural language questions.
+
+Class Methods:
+generate_sql(self, question, structure): Generates an SQL query based on the provided question and the structure of the database. It utilizes OpenAI's API to generate the query.
+forms.py
+This file defines the forms used in the application.
+
+Form Classes:
+QueryForm: Represents the form for executing SQL queries. It contains fields for the question and the query itself.
+LoginForm: Represents the form for user login. It contains fields for selecting the database type and entering the server, database, username, and password.
+QuestionForm: Represents the form for asking questions and generating SQL queries. It contains fields for the question and the query.
+HTML Templates:
+The application uses several HTML templates to define the layout and structure of the web pages.
+
+connect.html: Represents the connect page, where users can enter their database credentials.
+layout.html: Serves as the base template for other HTML files, providing a common structure and including necessary scripts and stylesheets.
+query.html: Represents the query page, where users can execute SQL queries and view the results.
+Stylesheets and Scripts:
+The application uses the following stylesheets and scripts:
+
+Styles.css: A custom CSS file for styling the application.
+bootstrap.min.css: The CSS file for Bootstrap, a popular CSS framework.
+jquery-3.5.1.js: The jQuery library for JavaScript functionality.
+bootstrap.bundle.min.js: The JavaScript file for Bootstrap, including both Bootstrap's JavaScript plugins and jQuery.
+datatables.min.css: The CSS file for the DataTables library, used to enhance table display.
+jquery.dataTables.min.js: The JavaScript file for the DataTables library, used for table functionality.
+Please note that this documentation provides an overview of the main components and functionality of the Text-To-SQL App. For more detailed information, refer to the individual files and their corresponding code comments.

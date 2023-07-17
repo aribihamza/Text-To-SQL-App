@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <!-- Your original stylesheet -->
-        <link rel="stylesheet" href="../static/styles.css">
-        <!-- Bootstrap CSS -->
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" >
-        <link rel="stylesheet" href="../static/bootstrap.min.css">
-        <!-- DataTables CSS -->
-        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.20/datatables.min.css">
-        <link rel="stylesheet" href="../static/datatables.min.css">
-        <link rel="stylesheet" href="../static/jquery.dataTables.min.css">
-        <title>Generate And Execute SQL Query</title>
-    </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Your original stylesheet -->
+    <link rel="stylesheet" href="../static/Styles.css">
+    <link rel="icon" type="image/x-icon" href="../static/images/favicon.ico">
+    <div class="logo-container">
+      <img src="../static/images/logo.jpg" alt="Logo d'Agri Data">
+    </div>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/bootstrap.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="../static/datatables.min.css">
+    <link rel="stylesheet" href="../static/jquery.dataTables.min.css">
+    <title>Generate And Execute SQL Query</title>
+</head>
 <body>
     
     <div class="container">
@@ -26,111 +28,106 @@
             <br>
             {{ form.submit(value="Generate And Execute SQL Query") }}
             <br>
-                
-                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editQueryModal">
-                    Edit and Run Query
-                </button>
-            </form>
-            <br>
-            <br>
-         <!-- This is the modal that will pop up when you click the button -->
-<div class="modal fade" id="editQueryModal" tabindex="-1" role="dialog" aria-labelledby="editQueryModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editQueryModalLabel">Edit And Execute SQL Query</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#editQueryModal">
+                Edit and Run Query
+            </button>
+        </form>
+        <br>
+        <br>
+        <!-- This is the modal that will pop up when you click the button -->
+        <div class="modal fade" id="editQueryModal" tabindex="-1" role="dialog" aria-labelledby="editQueryModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editQueryModalLabel">Edit And Execute SQL Query</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="/query">
+                            {{ form.hidden_tag() }}
+                            <label for="query">SQL Query :</label>
+                            <br>
+                            <textarea id="query" name="query" rows="4" cols="50">{{ previous_query }}</textarea>  <!-- Update this line -->
+                            <input type="hidden" name="question" value="{{ question }}">
+                            <br>
+                            {{ form.submit(value="Execute") }}
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-                <form method="POST" action="/query">
-                    {{ form.hidden_tag() }}
-                    <label for="query">SQL Query :</label>
-                    <br>
-                    <textarea id="query" name="query" rows="4" cols="50">{{ previous_query }}</textarea>  <!-- Update this line -->
-                    <input type="hidden" name="question" value="{{ question }}">
-                    <br>
-                    {{ form.submit(value="Execute") }}
-                </form>
+        </div>
+
+        <br>
+        
+        {% if results %}
+            <h2>Results :</h2>
+            <table id="results-table" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        {% for column in results[0].cursor_description %}
+                            <th>{{ column[0] }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in results %}
+                        <tr>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        <br>
+        
+        <!-- Modal -->
+        <div class="modal fade" id="flashModal" tabindex="-1" role="dialog" aria-labelledby="flashModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="flashModalLabel">Message</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- The message will be inserted here by the JavaScript -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-            <br>
-            
-            {% if results %}
-                <h2>Results :</h2>
-                <table id="results-table" class="table table-striped table-bordered">
-                    <thead>
-                        <tr>
-                            {% for column in results[0].cursor_description %}
-                                <th>{{ column[0] }}</th>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for row in results %}
-                            <tr>
-                                {% for value in row %}
-                                    <td>{{ value }}</td>
-                                {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            {% endif %}
-            <br>
-     <!-- Modal -->
-     <div class="modal fade" id="flashModal" tabindex="-1" role="dialog" aria-labelledby="flashModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="flashModalLabel">Message</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-              <!-- The message will be inserted here by the JavaScript -->
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
-            
-                <!-- Include Bootstrap JS -->
-                <script src="../static/jquery-3.5.1.js"></script>
-    <!-- script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script-->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="../static/jquery-3.5.1.js"></script>
+    <script src="../static/jquery-3.5.1.slim.min.js"></script>
     <script src="../static/bootstrap.bundle.min.js"></script>
-<script>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-        var flashModal = new bootstrap.Modal(document.getElementById('flashModal'), {});
-        document.querySelector('#flashModal .modal-body').innerText = "{{ messages[0] }}";
-        flashModal.show();
-    {% endif %}
-    {% endwith %}
-</script>
-
     
-<a href="/logout" class="btn btn-outline-danger btn-sm" id="logout-button">Logout</a>
-        </div>
-    </body>
-    
-    <!-- jQuery and DataTables with Bootstrap 4 styling -->
-     <script src="../static/jquery-3.5.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-    <script src="../static/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap4.min.js"></script>
-    <script src="../static/dataTables.bootstrap4.min.js"></script>
-    <script src="../js/bootstrap.bundle.min.js"></script>
     <script>
+        // Show the flash message in the modal when the document is ready
         $(document).ready(function() {
-            $('#results-table').DataTable();
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                var flashModal = new bootstrap.Modal(document.getElementById('flashModal'), {});
+                document.querySelector('#flashModal .modal-body').innerText = "{{ messages[0] }}";
+                flashModal.show();
+            {% endif %}
+            {% endwith %}
         });
     </script>
-    </html>
-    
+
+    <a href="/logout" class="btn btn-outline-danger btn-sm" id="logout-button">Logout</a>
+</body>
+
+<script src="../static/jquery.dataTables.min.js"></script>
+<script src="../static/dataTables.bootstrap4.min.js"></script>
+
+<script>
+    // Initialize DataTables on the results table
+    $(document).ready(function() {
+        $('#results-table').DataTable();
+    });
+</script>
+</html>

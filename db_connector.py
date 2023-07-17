@@ -9,20 +9,22 @@ class DBConnector:
         self.password = password
 
     def get_conn_str(self):
+        # Generate the connection string based on the database type
         if self.db_type == "sql_server":
             return f"DRIVER={{ODBC Driver 17 for SQL Server}};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}"
         elif self.db_type == "mysql":
             return f"DRIVER={{MySQL ODBC 8.0 Unicode Driver}};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}"
         elif self.db_type == "postgresql":
             return f"DRIVER={{PostgreSQL Unicode}};SERVER={self.server};DATABASE={self.database};UID={self.username};PWD={self.password}"
-     
 
     def connect(self):
+        # Establish a connection to the database using the connection string
         conn_str = self.get_conn_str()
         self.connection = pyodbc.connect(conn_str)
         return self.connection
     
     def get_db_structure(self):
+        # Retrieve the structure of the database (table names, column names, and data types)
         cursor = self.connection.cursor()
         db_type = self.db_type.lower()
 
@@ -34,10 +36,10 @@ class DBConnector:
             """
         elif db_type == "mysql":
             query = """
-                       SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
-                       FROM INFORMATION_SCHEMA.COLUMNS
-                       WHERE TABLE_SCHEMA = '{}'
-                       ORDER BY TABLE_NAME, ORDINAL_POSITION
+                SELECT TABLE_NAME, COLUMN_NAME, DATA_TYPE
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = '{}'
+                ORDER BY TABLE_NAME, ORDINAL_POSITION
             """.format(self.database)
         elif db_type == "postgresql":
             query = """
@@ -61,5 +63,6 @@ class DBConnector:
         return structure
 
     def close(self):
+        # Close the database connection if it is open
         if self.connection:
             self.connection.close()
